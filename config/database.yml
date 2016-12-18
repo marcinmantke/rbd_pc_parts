@@ -1,7 +1,8 @@
 development: &default
   adapter: postgresql
   encoding: unicode
-  database: postgres
+  database: rdb_test_1
+  port: 9999
   pool: 5
   username: postgres
   password:
