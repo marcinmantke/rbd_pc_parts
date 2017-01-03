@@ -1,6 +1,6 @@
 class CreateProducts < ActiveRecord::Migration[5.0]
   def change
-    create_table :products do |t|
+    create_table :products, id: false do |t|
       t.string :real_id, null: false, unique: true
       t.string :name
       t.string :category_id

@@ -34,7 +34,7 @@ services:
       - db_central
   web_1:
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid* && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    command: bash -c "rm -f tmp/pids/server1.pid && bundle exec rails s -p 3000 -b '0.0.0.0' --pid `pwd`/tmp/pids/server1.pid"
     environment:
       - PK_PREFIX=web1
     volumes:
@@ -46,12 +46,12 @@ services:
       - db_local_1_pgpool
     links:
       - db_local_1_pgpool:db
-    tty: true
-    stdin_open: true
+    # tty: true
+    # stdin_open: true
 
   web_2:
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid* && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    command: bash -c "rm -f tmp/pids/server2.pid && bundle exec rails s -p 3000 -b '0.0.0.0' --pid `pwd`/tmp/pids/server2.pid"
     environment:
       - PK_PREFIX=web2
     volumes:
@@ -63,5 +63,5 @@ services:
       - db_local_2_pgpool
     links:
       - db_local_2_pgpool:db
-    tty: true
-    stdin_open: true
+    # tty: true
+    # stdin_open: true
