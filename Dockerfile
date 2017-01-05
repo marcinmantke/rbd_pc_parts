@@ -5,3 +5,7 @@ WORKDIR /code
 ADD Gemfile /code/Gemfile
 ADD Gemfile.lock /code/Gemfile.lock
 RUN bundle install
+
+RUN mkdir /tmp/rails
+RUN rm -rf tmp/
+RUN ln -s /tmp/rails tmp
