@@ -13,7 +13,6 @@ services:
     volumes:
       - db_local_1-data:/var/lib/postgresql/data
   db_local_1_pgpool:
-    # image: postgres_pgpool
     build:
       context: .
       dockerfile: Dockerfile.pgpool
@@ -25,7 +24,6 @@ services:
     volumes:
       - db_local_2-data:/var/lib/postgresql/data
   db_local_2_pgpool:
-    # image: postgres_pgpool
     build:
       context: .
       dockerfile: Dockerfile.pgpool
@@ -40,7 +38,7 @@ services:
     volumes:
       - .:/code
     ports:
-      - "4000:3000"
+      - "3000:3000"
     depends_on:
       - db_central
       - db_local_1_pgpool
@@ -57,7 +55,7 @@ services:
     volumes:
       - .:/code
     ports:
-      - "4001:3000"
+      - "3001:3000"
     depends_on:
       - db_central
       - db_local_2_pgpool
