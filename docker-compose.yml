@@ -1,34 +1,67 @@
-    version: '2'
-    services:
-      db_central:
-        image: postgres
-      db_local_1:
-        image: postgres
-      db_local_2:
-        image: postgres
-      web_1:
-        build: .
-        command: bundle exec rails s -b '0.0.0.0'
-        volumes:
-          - .:/rbd_warehouse_1
-        ports:
-          - "4000:3000"
-        depends_on:
-          # - db_central
-          - db_local_1
-        links:
-          # - db_central
-          - db_local_1:db
-      web_2:
-        build: .
-        command: bundle exec rails s -p 3000 -b '0.0.0.0'
-        volumes:
-          - .:/rbd_warehouse_2
-        ports:
-          - "4001:3000"
-        depends_on:
-          # - db_central
-          - db_local_2
-        links:
-          # - db_central
-          - db_local_2:db
+version: '2'
+volumes:
+  db_central-data:
+  db_local_1-data:
+  db_local_2-data:
+services:
+  db_central:
+    image: postgres
+    volumes:
+      - db_central-data:/var/lib/postgresql/data
+  db_local_1:
+    image: postgres
+    volumes:
+      - db_local_1-data:/var/lib/postgresql/data
+  db_local_1_pgpool:
+    # image: postgres_pgpool
+    build:
+      context: .
+      dockerfile: Dockerfile.pgpool
+    external_links:
+      - db_local_1:db_local
+      - db_central
+  db_local_2:
+    image: postgres
+    volumes:
+      - db_local_2-data:/var/lib/postgresql/data
+  db_local_2_pgpool:
+    # image: postgres_pgpool
+    build:
+      context: .
+      dockerfile: Dockerfile.pgpool
+    external_links:
+      - db_local_2:db_local
+      - db_central
+  web_1:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
+    environment:
+      - PK_PREFIX=web1
+    volumes:
+      - .:/code
+    ports:
+      - "4000:3000"
+    depends_on:
+      - db_central
+      - db_local_1_pgpool
+    links:
+      - db_local_1_pgpool:db
+    # tty: true
+    # stdin_open: true
+
+  web_2:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
+    environment:
+      - PK_PREFIX=web2
+    volumes:
+      - .:/code
+    ports:
+      - "4001:3000"
+    depends_on:
+      - db_central
+      - db_local_2_pgpool
+    links:
+      - db_local_2_pgpool:db
+    # tty: true
+    # stdin_open: true

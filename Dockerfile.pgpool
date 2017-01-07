@@ -1,0 +1,31 @@
+FROM postgres:latest
+
+RUN apt-get update && apt-get install -y wget gcc make vim libpq-dev
+
+# Note: The official Debian and Ubuntu images automatically ``apt-get clean``
+# after each ``apt-get``
+
+# Install pgpool
+RUN wget http://www.pgpool.net/mediawiki/download.php?f=pgpool-II-3.6.0.tar.gz -O pgpool-II-3.6.0.tar.gz
+RUN tar -xzf pgpool-II-3.6.0.tar.gz
+WORKDIR pgpool-II-3.6.0
+RUN ./configure && make && make install
+
+WORKDIR /
+
+COPY pgpool.conf /usr/local/etc/pgpool.conf
+
+#RUN cp /usr/local/etc/pgpool.conf.sample-stream /usr/local/etc/pgpool.conf
+RUN mkdir /var/run/pgpool/
+
+# Expose the PostgreSQL port
+EXPOSE 9999
+
+# Add VOLUMEs to allow backup of config, logs and databases
+# VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
+
+# Set the default command to run when starting the container
+CMD rm -f /var/run/pgpool/pgpool.pid && \
+    rm -f /var/run/postgresql/.s.PGSQL.9999 && \
+    rm -f /var/run/postgresql/.s.PGSQL.9898 && \
+    pgpool -n -d
